@@ -5,9 +5,10 @@ const {randomBytes} = require("crypto");
  * @typedef {import('moleculer').Context} Context Moleculer's Context
  */
 
-const posts={};
+const commentsByPostId={};
 module.exports = {
-	name: "posts",
+	name: "comments",
+
 
 	/**
 	 * Settings
@@ -28,31 +29,38 @@ module.exports = {
 	actions: {
 
 
-		get: {
+		read: {
 			rest: {
 				method: "GET",
-				path: "/"
-			},
-			async handler() {
-				return posts;
-			}
-		},
-		create: {
-			rest: {
-				method: "POST",
-				path: "/"
+				path: "/posts/:id/comments"
 			},
 			params: {
-				title: "string",
+				id: "string",
+			},
+			async handler(ctx) {
+				console.log(ctx)
+				return commentsByPostId[ctx.params.id] || [];
+			}
+		},
+		save: {
+			rest: {
+				method: "POST",
+				path: "/posts/:id/comments"
+			},
+			params: {
+				id: "string",
+				content:"string"
 				
 			},
 			async handler(ctx) {
-				const id=randomBytes(4).toString('hex');
-				console.log(ctx.params.title);
-				
-				posts[id]=ctx.params.title;
+				const commentId=randomBytes(4).toString('hex');
+				//console.log(ctx.params.id);
+				//console.log(ctx.params.content);
+				const comments=commentsByPostId[ctx.params.id] || [];
+				comments.push({id:commentId, content:ctx.params.content});
+				commentsByPostId[ctx.params.id] =comments;
 
-				return {'id':id,'title':posts[id]};
+				return  {'id':commentId,'content':comments};
 			}
 		},
 
