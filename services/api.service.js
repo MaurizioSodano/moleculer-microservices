@@ -20,17 +20,27 @@ module.exports = {
 		// Exposed IP
 		ip: "0.0.0.0",
 
+        // Global CORS settings for all routes
+        cors: {
+            origin: "*",
+            methods: ["GET", "OPTIONS", "POST", "PUT", "DELETE"],
+        },
 		// Global Express middlewares. More info: https://moleculer.services/docs/0.14/moleculer-web.html#Middlewares
 		use: [],
 
 		routes: [
 			{
-				path: "/api",
+				path: "/",
 
 				whitelist: [
 					"**"
 				],
-
+/*                 // Route CORS settings (overwrite global settings)
+                cors: {
+                    origin: ["http://localhost:3000", "https://localhost:4000"],
+                    methods: ["GET", "OPTIONS", "POST"],
+                    credentials: true
+                }, */
 				// Route-level Express middlewares. More info: https://moleculer.services/docs/0.14/moleculer-web.html#Middlewares
 				use: [],
 
