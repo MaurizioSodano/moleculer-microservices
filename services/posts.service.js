@@ -49,10 +49,10 @@ module.exports = {
 			async handler(ctx) {
 				const id=randomBytes(4).toString('hex');
 				console.log(ctx.params.title);
-				
-				posts[id]=ctx.params.title;
+				const title=ctx.params.title;
+				posts[id]={id ,title};
 
-				return {'id':id,'title':posts[id]};
+				return {'id':id,'title':title};
 			}
 		},
 

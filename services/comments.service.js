@@ -38,7 +38,7 @@ module.exports = {
 				id: "string",
 			},
 			async handler(ctx) {
-				console.log(ctx)
+				//console.log(ctx)
 				return commentsByPostId[ctx.params.id] || [];
 			}
 		},
