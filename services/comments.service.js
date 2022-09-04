@@ -32,7 +32,7 @@ module.exports = {
 		read: {
 			rest: {
 				method: "GET",
-				path: "/posts/:id/comments"
+				fullPath: "/posts/:id/comments"
 			},
 			params: {
 				id: "string",
@@ -45,7 +45,7 @@ module.exports = {
 		save: {
 			rest: {
 				method: "POST",
-				path: "/posts/:id/comments"
+				fullPath: "/posts/:id/comments"
 			},
 			params: {
 				id: "string",

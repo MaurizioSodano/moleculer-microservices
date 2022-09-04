@@ -58,7 +58,7 @@ module.exports = {
 				autoAliases: true,
 
 				aliases: {
-
+					
 				},
 
 				/** 
