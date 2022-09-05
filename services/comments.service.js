@@ -1,11 +1,11 @@
 "use strict";
 
-const {randomBytes} = require("crypto");
+const { randomBytes } = require("crypto");
 /**
  * @typedef {import('moleculer').Context} Context Moleculer's Context
  */
 
-const commentsByPostId={};
+const commentsByPostId = {};
 module.exports = {
 	name: "comments",
 
@@ -14,7 +14,7 @@ module.exports = {
 	 * Settings
 	 */
 	settings: {
-		
+
 
 	},
 
@@ -49,18 +49,19 @@ module.exports = {
 			},
 			params: {
 				id: "string",
-				content:"string"
-				
+				content: "string"
+
 			},
 			async handler(ctx) {
-				const commentId=randomBytes(4).toString('hex');
+				const commentId = randomBytes(4).toString('hex');
+				const time = Date.now();
 				//console.log(ctx.params.id);
 				//console.log(ctx.params.content);
-				const comments=commentsByPostId[ctx.params.id] || [];
-				comments.push({id:commentId, content:ctx.params.content});
-				commentsByPostId[ctx.params.id] =comments;
-				ctx.broker.broadcast("comment.created", {'id':commentId,'content':ctx.params.content,'postId':ctx.params.id});
-				return  {'id':commentId,'content':ctx.params.content};
+				const comments = commentsByPostId[ctx.params.id] || [];
+				comments.push({ id: commentId, content: ctx.params.content, status: "pending", timestamp: time });
+				commentsByPostId[ctx.params.id] = comments;
+				ctx.broker.broadcast("comment.created", { 'id': commentId, 'content': ctx.params.content, 'postId': ctx.params.id, 'status': 'pending', timestamp: time });
+				return { 'id': commentId, 'content': ctx.params.content };
 			}
 		},
 
@@ -70,7 +71,30 @@ module.exports = {
 	 * Events
 	 */
 	events: {
-
+		"comment.moderated": {
+			// Validation schema
+			params: {
+				id: "string",
+				content: "string",
+				postId: "string",
+				status: "string"
+			},
+			async handler(ctx) {
+				const time = Date.now();
+				this.logger.info("Event received ", ctx.event.name);
+				this.logger.info("params", ctx.event.params);
+				const comments = commentsByPostId[ctx.params.postId] || [];
+				const comment = comments.find(comment => { return comment.id === ctx.params.id });
+				this.logger.info("received moderated comment:", ctx.params.content, ctx.params.status)
+				var status = ctx.params.content == "orange" ? "rejected" : "approved";
+				comment.status = status;
+				comment.timestamp = time
+				this.logger.info("new comment:", comment)
+				ctx.broker.broadcast("comment.updated", { 'id': ctx.params.id, 'content': ctx.params.content, 'postId': ctx.params.postId, 'status': status, timestamp: time });
+				//await ctx.broker.broadcast("comment.moderated", {'id':commentId,'content':ctx.params.content,'postId':ctx.params.id,status});
+				return;
+			}
+		}
 	},
 
 	/**
@@ -84,7 +108,7 @@ module.exports = {
 	 * Service created lifecycle event handler
 	 */
 	created() {
-		this.settings.posts={}
+		this.settings.posts = {}
 	},
 
 	/**

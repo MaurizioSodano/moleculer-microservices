@@ -4,7 +4,7 @@
  * @typedef {import('moleculer').Context} Context Moleculer's Context
  */
 
-const posts={};
+const posts = {};
 module.exports = {
 	name: "query",
 
@@ -12,7 +12,7 @@ module.exports = {
 	 * Settings
 	 */
 	settings: {
-		
+
 
 	},
 
@@ -21,35 +21,88 @@ module.exports = {
 	 */
 	dependencies: [],
 	events: {
-		"post.created":{
+		"post.created": {
 			// Validation schema
 			params: {
 				id: "string",
 				title: "string"
 			},
-			handler(ctx){
-				console.log("Event received, parameters OK!", ctx.params);
-				
-				posts[ctx.params.id]={"id":ctx.params.id ,"title":ctx.params.title, comments:[]} 
+			handler(ctx) {
+				this.logger.info("Event received, parameters OK!", ctx.event.name);
+
+				posts[ctx.params.id] = { "id": ctx.params.id, "title": ctx.params.title, comments: [] };
+				return;
 			}
 		},
-		"comment.created":{
-				// Validation schema
-				params: {
-					id: "string",
-					content: "string",
-					postId:"string"
-				},
-				handler(ctx){
-					console.log("Event received, parameters OK!", ctx.params);
-					var post=posts[ctx.params.postId];
-	
-					var comments=post.comments;
-	
-					comments.push({"id":ctx.params.id,"content":ctx.params.content});
-		
-					posts[ctx.params.postId]={"id":post.id ,"title":post.title,comments}
+		"comment.created": {
+			// Validation schema
+			params: {
+				id: "string",
+				content: "string",
+				postId: "string",
+				status: "string",
+				timestamp: "number"
+			},
+			handler(ctx) {
+				this.logger.info("Event received, parameters OK!", ctx.event.name);
+				this.logger.info("params:", ctx.params)
+				this.logger.info("status:", ctx.params.status);
+				const approved = ctx.params.status;
+				var post = posts[ctx.params.postId];
+
+				const comments = post.comments;
+				var comment = comments.find(comment => { return comment.id === ctx.params.id });
+				if (comment == null) {
+					comment = { "id": ctx.params.id, "content": ctx.params.content, "status": ctx.params.status, time: ctx.params.timestamp }
+					comments.push(comment);
+					this.logger.info("Comment created:", comment)
+				} else { this.logger.info("Comment updated:", comment) }
+
+
+				posts[ctx.params.postId] = { "id": post.id, "title": post.title, comments }
+				return;
+			}
+		},
+		"comment.updated": {
+			// Validation schema
+			params: {
+				id: "string",
+				content: "string",
+				postId: "string",
+				status: "string",
+				timestamp: "number"
+			},
+			handler(ctx) {
+				this.logger.info("Event received, parameters OK!", ctx.event.name);
+				this.logger.info("params:", ctx.params);
+
+				var post = posts[ctx.params.postId];
+
+				const comments = post.comments;
+				var comment = comments.find(comment => { return comment.id === ctx.params.id });
+
+				if (comment == null) {
+					
+					comment = { "id": ctx.params.id, "content": ctx.params.content, "status": ctx.params.status,"timestamp":ctx.params.timestamp }
+					comments.push(comment);
+					this.logger.info("Comment created:", comment)
+				}else if ( comment.timestamp < ctx.params.timestamp){
+					comment = { "id": ctx.params.id, "content": ctx.params.content, "status": ctx.params.status,"timestamp":ctx.params.timestamp }
+					this.logger.info("Comment created, timestamp:", comment);
+					comments.push(comment);
+				
+				} else {
+					
+					comment.status = ctx.params.status;
+					comment.content = ctx.params.content;
+					comment.timestamp = ctx.params.timestamp;
+					this.logger.info("Comment updated:", comment)
 				}
+
+
+				posts[ctx.params.postId] = { "id": post.id, "title": post.title, comments };
+				return;
+			}
 		}
 
 	},
@@ -85,7 +138,7 @@ module.exports = {
 	 * Service created lifecycle event handler
 	 */
 	created() {
-		this.settings.posts={}
+		this.settings.posts = {}
 	},
 
 	/**
