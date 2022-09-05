@@ -48,10 +48,10 @@ module.exports = {
 			},
 			async handler(ctx) {
 				const id=randomBytes(4).toString('hex');
-				console.log(ctx.params.title);
+				//console.log(ctx.params.title);
 				const title=ctx.params.title;
 				posts[id]={id ,title};
-
+				ctx.broker.broadcast("post.created", {'id':id,'title':title});
 				return {'id':id,'title':title};
 			}
 		},

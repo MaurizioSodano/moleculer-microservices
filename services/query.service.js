@@ -4,13 +4,15 @@
  * @typedef {import('moleculer').Context} Context Moleculer's Context
  */
 
+const posts={};
 module.exports = {
-	name: "greeter",
+	name: "query",
 
 	/**
 	 * Settings
 	 */
 	settings: {
+		
 
 	},
 
@@ -18,50 +20,41 @@ module.exports = {
 	 * Dependencies
 	 */
 	dependencies: [],
+	events: {
+		"post.created":{
+			// Validation schema
+			params: {
+				id: "string",
+				title: "string"
+			},
+			handler(ctx){
+				this.logger.info("Event received, parameters OK!", ctx.params);
+				console.log(ctx.params);
+				posts[ctx.params.id]=ctx.params.title
+			}
+		},
 
+	},
 	/**
 	 * Actions
 	 */
 	actions: {
 
-		/**
-		 * Say a 'Hello' action.
-		 *
-		 * @returns
-		 */
-		hello: {
+
+		get: {
 			rest: {
 				method: "GET",
-				path: "/hello"
+				fullPath: "/posts"
 			},
 			async handler() {
-				return "Hello Moleculer";
+				return posts;
 			}
 		},
 
-		/**
-		 * Welcome, a username
-		 *
-		 * @param {String} name - User name
-		 */
-		welcome: {
-			rest: "/welcome",
-			params: {
-				name: "string"
-			},
-			/** @param {Context} ctx  */
-			async handler(ctx) {
-				return `Welcome, ${ctx.params.name}`;
-			}
-		}
-	},
-
-	/**
-	 * Events
-	 */
-	events: {
 
 	},
+
+
 
 	/**
 	 * Methods
@@ -74,7 +67,7 @@ module.exports = {
 	 * Service created lifecycle event handler
 	 */
 	created() {
-
+		this.settings.posts={}
 	},
 
 	/**

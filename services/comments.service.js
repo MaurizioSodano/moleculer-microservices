@@ -59,7 +59,7 @@ module.exports = {
 				const comments=commentsByPostId[ctx.params.id] || [];
 				comments.push({id:commentId, content:ctx.params.content});
 				commentsByPostId[ctx.params.id] =comments;
-
+				ctx.broker.broadcast("comment.created", {'id':commentId,'content':ctx.params.content,'postId':ctx.params.id});
 				return  {'id':commentId,'content':comments};
 			}
 		},

@@ -19,18 +19,43 @@ services:
     networks:
       - internal
 
-  greeter:
+
+  posts:
     build:
       context: .
     image: microservices
     env_file: docker-compose.env
     environment:
-      SERVICES: greeter
+      SERVICES: posts
     depends_on:
       - nats
     networks:
       - internal
 
+  comments:
+    build:
+      context: .
+    image: microservices
+    env_file: docker-compose.env
+    environment:
+      SERVICES: comments
+    depends_on:
+      - nats
+    networks:
+      - internal
+
+
+  query:
+    build:
+      context: .
+    image: microservices
+    env_file: docker-compose.env
+    environment:
+      SERVICES: query
+    depends_on:
+      - nats
+    networks:
+      - internal
   nats:
     image: nats:2
     networks:
