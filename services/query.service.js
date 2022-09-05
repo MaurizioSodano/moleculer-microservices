@@ -30,7 +30,7 @@ module.exports = {
 			handler(ctx){
 				this.logger.info("Event received, parameters OK!", ctx.params);
 				console.log(ctx.params);
-				posts[ctx.params.id]=ctx.params.title
+				posts[ctx.params.id]={"id":ctx.params.id ,"title":ctx.params.title} 
 			}
 		},
 
