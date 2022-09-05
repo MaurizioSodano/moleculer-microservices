@@ -43,11 +43,11 @@ module.exports = {
 				handler(ctx){
 					console.log("Event received, parameters OK!", ctx.params);
 					var post=posts[ctx.params.postId];
-					console.log("read post:",post);
+	
 					var comments=post.comments;
-					console.log("read comments",comments);
+	
 					comments.push({"id":ctx.params.id,"content":ctx.params.content});
-					console.log(comments);
+		
 					posts[ctx.params.postId]={"id":post.id ,"title":post.title,comments}
 				}
 		}
