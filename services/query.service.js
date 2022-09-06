@@ -117,7 +117,7 @@ module.exports = {
 				method: "GET",
 				fullPath: "/posts"
 			},
-			async handler() {
+			handler() {
 				return posts;
 			}
 		},

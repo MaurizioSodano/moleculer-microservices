@@ -37,7 +37,7 @@ module.exports = {
 				this.logger.info("content:", ctx.params.content, ", status:", approval)
 				const newComment={ 'id': ctx.params.id, 'content': ctx.params.content, 'postId': ctx.params.postId, 'status': approval , timestamp: ctx.params.timestamp}
 				this.logger.info("new comment:",newComment)
-				ctx.broker.broadcast("comment.moderated",newComment );
+				this.broker.emit("comment.moderated",newComment );
 				return;
 			}
 		}

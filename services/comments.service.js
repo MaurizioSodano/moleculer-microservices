@@ -52,7 +52,7 @@ module.exports = {
 				content: "string"
 
 			},
-			async handler(ctx) {
+			 handler(ctx) {
 				const commentId = randomBytes(4).toString('hex');
 				const time = Date.now();
 				//console.log(ctx.params.id);
@@ -60,7 +60,7 @@ module.exports = {
 				const comments = commentsByPostId[ctx.params.id] || [];
 				comments.push({ id: commentId, content: ctx.params.content, status: "pending", timestamp: time });
 				commentsByPostId[ctx.params.id] = comments;
-				ctx.broker.broadcast("comment.created", { 'id': commentId, 'content': ctx.params.content, 'postId': ctx.params.id, 'status': 'pending', timestamp: time });
+				this.broker.emit("comment.created", { 'id': commentId, 'content': ctx.params.content, 'postId': ctx.params.id, 'status': 'pending', timestamp: time });
 				return { 'id': commentId, 'content': ctx.params.content };
 			}
 		},
@@ -79,18 +79,18 @@ module.exports = {
 				postId: "string",
 				status: "string"
 			},
-			async handler(ctx) {
+			handler(ctx) {
 				const time = Date.now();
 				this.logger.info("Event received ", ctx.event.name);
 				this.logger.info("params", ctx.event.params);
 				const comments = commentsByPostId[ctx.params.postId] || [];
 				const comment = comments.find(comment => { return comment.id === ctx.params.id });
 				this.logger.info("received moderated comment:", ctx.params.content, ctx.params.status)
-				var status = ctx.params.content == "orange" ? "rejected" : "approved";
+				var status = ctx.params.status;
 				comment.status = status;
 				comment.timestamp = time
 				this.logger.info("new comment:", comment)
-				ctx.broker.broadcast("comment.updated", { 'id': ctx.params.id, 'content': ctx.params.content, 'postId': ctx.params.postId, 'status': status, timestamp: time });
+				this.broker.emit("comment.updated", { 'id': ctx.params.id, 'content': ctx.params.content, 'postId': ctx.params.postId, 'status': status, timestamp: time });
 				//await ctx.broker.broadcast("comment.moderated", {'id':commentId,'content':ctx.params.content,'postId':ctx.params.id,status});
 				return;
 			}
