@@ -1,0 +1,3 @@
+GET http://localhost:3000/posts/13e9c8bb/comments HTTP/1.1
+content-type: application/json
+
