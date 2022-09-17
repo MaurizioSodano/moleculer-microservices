@@ -36,22 +36,22 @@ spec:
     targetPort: 3000
 
 ---
-#########################################################
-# Ingress for Moleculer API Gateway
-#########################################################
-apiVersion: networking.k8s.io/v1beta1
-kind: Ingress
-metadata:
-  name: ingress
-spec:
-  rules:
-  - host: microservices.127.0.0.1.nip.io
-    http:
-      paths:
-      - path: /
-        backend:
-          serviceName: api
-          servicePort: 3000
+# #########################################################
+# # Ingress for Moleculer API Gateway
+# #########################################################
+# apiVersion: networking.k8s.io/v1beta1
+# kind: Ingress
+# metadata:
+#   name: ingress
+# spec:
+#   rules:
+#   - host: microservices.127.0.0.1.nip.io
+#     http:
+#       paths:
+#       - path: /
+#         backend:
+#           serviceName: api
+#           servicePort: 3000
 
 ---
 #########################################################
@@ -83,31 +83,57 @@ spec:
 
 ---
 #########################################################
-# Greeter service
+# posts service
 #########################################################
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: v1
+kind: Pod
 metadata:
-  name: greeter
+  name: posts
 spec:
-  selector:
-    matchLabels:
-      app: greeter
-  replicas: 2
-  template:
-    metadata:
-      labels:
-        app: greeter
-    spec:
-      containers:
-      - name: greeter
-        image: microservices
-        envFrom:
-        - configMapRef:
-            name: common-env
-        env:
-          - name: SERVICES
-            value: greeter
+  containers:
+    - name: posts
+      image: microservices
+      imagePullPolicy: Never
+---
+#########################################################
+# comments service
+#########################################################
+apiVersion: v1
+kind: Pod
+metadata:
+  name: comments
+spec:
+  containers:
+    - name: comments
+      image: microservices
+      imagePullPolicy: Never
+
+---
+#########################################################
+# query service
+#########################################################
+apiVersion: v1
+kind: Pod
+metadata:
+  name: query
+spec:
+  containers:
+    - name: query
+      image: microservices
+      imagePullPolicy: Never
+---
+#########################################################
+# moderation service
+#########################################################
+apiVersion: v1
+kind: Pod
+metadata:
+  name: moderation
+spec:
+  containers:
+    - name: moderation
+      image: microservices
+      imagePullPolicy: Never
 
 
 ---
